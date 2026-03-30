@@ -1,5 +1,3 @@
-pandas
-numpy
-scikit-learn
 streamlit
-pytest
+pandas
+scikit-learn
