@@ -170,9 +170,6 @@ with left_col:
             step=1.0
         )
 
-    # This line adds a small space before the button
-    st.markdown("<br>", unsafe_allow_html=True)
-
     # This line creates the prediction button
     predict_button = st.button("Predict Customer Segment")
 
