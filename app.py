@@ -1,13 +1,13 @@
-# This line imports streamlit for building the web application
+# This line imports streamlit for the web app
 import streamlit as st
 
 # This line imports the prediction function
 from src.predict import predict_cluster
 
-# This line imports json for loading saved metrics if available
+# This line imports json for reading saved summary files if available
 import json
 
-# This line imports os for checking whether files exist
+# This line imports os for checking file paths
 import os
 
 # This line sets the page configuration
@@ -16,102 +16,66 @@ st.set_page_config(
     layout="wide"
 )
 
-# This line adds custom CSS for styling the whole application
+# This line adds custom CSS styling for the design
 st.markdown(
     """
     <style>
     .stApp {
-        background: linear-gradient(135deg, #f8fafc, #ecfeff, #fefce8);
+        background: linear-gradient(135deg, #fff7ed, #fffbeb, #f0fdfa);
     }
 
     .main-title {
         font-size: 2.7rem;
         font-weight: 800;
         text-align: center;
-        color: #1e293b;
+        color: #1f2937;
         margin-bottom: 0.2rem;
     }
 
     .sub-title {
         font-size: 1.05rem;
         text-align: center;
-        color: #475569;
+        color: #4b5563;
         margin-bottom: 2rem;
     }
 
     .section-title {
-        font-size: 1.35rem;
+        font-size: 1.3rem;
         font-weight: 700;
-        color: #0f172a;
+        color: #111827;
         margin-bottom: 1rem;
     }
 
-    .summary-box {
-        background: rgba(255, 255, 255, 0.72);
-        border: 1px solid rgba(148, 163, 184, 0.25);
-        border-radius: 18px;
-        padding: 18px;
-        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
-        margin-bottom: 1rem;
-    }
-
-    .result-box {
-        background: linear-gradient(135deg, #0ea5e9, #6366f1);
+    .segment-card {
+        background: linear-gradient(135deg, #f59e0b, #14b8a6);
         color: white;
-        padding: 20px;
+        padding: 18px;
         border-radius: 18px;
         margin-top: 16px;
-        box-shadow: 0 10px 24px rgba(99, 102, 241, 0.22);
     }
 
-    .result-title {
-        font-size: 0.95rem;
-        margin-bottom: 0.35rem;
-        opacity: 0.95;
-    }
-
-    .result-value {
+    .segment-value {
         font-size: 1.5rem;
         font-weight: 800;
-        margin-bottom: 0.4rem;
-    }
-
-    .result-text {
-        font-size: 1rem;
     }
 
     div.stButton > button {
         width: 100%;
         height: 48px;
-        border: none;
         border-radius: 14px;
-        background: linear-gradient(90deg, #0284c7, #4f46e5);
+        border: none;
+        background: linear-gradient(90deg, #f59e0b, #0f766e);
         color: white;
         font-size: 1rem;
         font-weight: 700;
-        box-shadow: 0 10px 20px rgba(79, 70, 229, 0.20);
-    }
-
-    div.stButton > button:hover {
-        background: linear-gradient(90deg, #0369a1, #4338ca);
-    }
-
-    [data-testid="stMetric"] {
-        background: rgba(255, 255, 255, 0.70);
-        border: 1px solid rgba(203, 213, 225, 0.7);
-        border-radius: 16px;
-        padding: 10px;
     }
     </style>
     """,
     unsafe_allow_html=True
 )
 
-# This line displays the main title
-st.markdown(
-    '<div class="main-title">Mall Customer Segmentation App</div>',
-    unsafe_allow_html=True
-)
+# This line displays the title
+st.markdown('<div class="main-title">Mall Customer Segmentation App</div>', unsafe_allow_html=True)
 
 # This line displays the subtitle
 st.markdown(
@@ -119,7 +83,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# This line creates a dictionary that explains each cluster label
+# This line defines cluster meanings
 cluster_labels = {
     0: "Moderate Income and Low Spending Customers",
     1: "Moderate Income and High Spending Customers",
@@ -128,21 +92,20 @@ cluster_labels = {
     4: "High Income and Low Spending Customers"
 }
 
-# This line creates two main columns for the page layout
-left_col, right_col = st.columns([2, 1], gap="large")
+# This line creates layout columns
+left_col, _ = st.columns([2, 1])
 
-# This block creates the left side input area
+# This block handles input section
 with left_col:
 
-    # This line displays the customer details section title
+    # This line shows section title
     st.markdown('<div class="section-title">Customer Details</div>', unsafe_allow_html=True)
 
-    # This line creates two inner columns for input alignment
+    # This line creates inner columns
     col1, col2 = st.columns(2)
 
-    # This block contains the left inner column inputs
+    # First column inputs
     with col1:
-        # This line creates the age input
         age = st.number_input(
             "Age",
             min_value=1,
@@ -151,7 +114,6 @@ with left_col:
             step=1
         )
 
-        # This line creates the spending score slider
         spending_score = st.slider(
             "Spending Score",
             min_value=0.0,
@@ -160,9 +122,8 @@ with left_col:
             step=1.0
         )
 
-    # This block contains the right inner column inputs
+    # Second column inputs
     with col2:
-        # This line creates the annual income input
         annual_income = st.number_input(
             "Annual Income",
             min_value=0.0,
@@ -170,128 +131,38 @@ with left_col:
             step=1.0
         )
 
-    # This line adds a little space before the button
-    st.markdown("<br>", unsafe_allow_html=True)
+    # This line creates predict button
+    if st.button("Predict Customer Segment"):
 
-    # This line creates the prediction button
-    predict_button = st.button("Predict Customer Segment")
-
-    # This line checks whether the prediction button was clicked
-    if predict_button:
-        # This line creates the user input dictionary for the model
+        # This line prepares input data
         user_input = {
             "Age": age,
             "Annual_Income": annual_income,
             "Spending_Score": spending_score
         }
 
-        # This line starts the prediction block
         try:
-            # This line gets the cluster prediction from the model
+            # This line gets prediction
             result = predict_cluster(user_input)
 
-            # This line gets the human readable label for the cluster
+            # This line gets cluster meaning
             cluster_meaning = cluster_labels.get(result, "Unknown Customer Segment")
 
-            # This line displays the prediction result in a styled box
+            # This line displays result
             st.markdown(
-                f"""
-                <div class="result-box">
-                    <div class="result-title">Predicted Customer Segment</div>
-                    <div class="result-value">Cluster {result}</div>
-                    <div class="result-text">{cluster_meaning}</div>
+                f'''
+                <div class="segment-card">
+                    <div class="segment-value">Cluster {result}</div>
+                    <div>{cluster_meaning}</div>
                 </div>
-                """,
+                ''',
                 unsafe_allow_html=True
             )
 
-            # This line displays an explanation message
+            # This line shows explanation
             st.info(
-                "Cluster labels are identifiers created by KMeans. "
-                "Customers in the same cluster usually show similar behavior."
+                "Clusters represent groups of customers with similar behavior."
             )
 
-        # This block handles errors during prediction
         except Exception as exc:
-            # This line displays the prediction error
             st.error(f"Prediction failed: {exc}")
-
-# This block creates the right side summary area
-with right_col:
-
-    # This line displays the model summary section title
-    st.markdown('<div class="section-title">Model Summary</div>', unsafe_allow_html=True)
-
-    # This line opens a styled summary container
-    st.markdown('<div class="summary-box">', unsafe_allow_html=True)
-
-    # This line displays the model type label
-    st.write("Model Type")
-
-    # This line displays the model type value
-    st.write("KMeans Clustering")
-
-    # This line displays the features heading
-    st.write("Input Features")
-
-    # This line displays the input features used by the model
-    st.write("Age, Annual Income, Spending Score")
-
-    # This line closes the first summary container
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    # This line starts a try block for loading saved metrics
-    try:
-        # This line sets the path to the metrics file
-        metrics_path = "artifacts/metrics.json"
-
-        # This line checks whether the metrics file exists
-        if os.path.exists(metrics_path):
-
-            # This line opens and loads the metrics file
-            with open(metrics_path, "r") as file:
-                metrics = json.load(file)
-
-            # This line displays the saved metrics heading
-            st.markdown('<div class="section-title">Saved Metrics</div>', unsafe_allow_html=True)
-
-            # This line loops through the metrics and displays them one by one
-            for key, value in metrics.items():
-                try:
-                    st.metric(label=key, value=round(float(value), 4))
-                except Exception:
-                    st.metric(label=key, value=value)
-
-        # This block runs if the metrics file does not exist
-        else:
-            # This line displays an info message
-            st.info("No saved summary file found. Train the model first if you want metrics here.")
-
-    # This block handles metric loading errors
-    except Exception as exc:
-        # This line displays the metric loading error
-        st.error(f"Could not load summary: {exc}")
-
-    # This line displays the segment guide heading
-    st.markdown('<div class="section-title">Segment Guide</div>', unsafe_allow_html=True)
-
-    # This line opens another styled summary container
-    st.markdown('<div class="summary-box">', unsafe_allow_html=True)
-
-    # This line displays the first segment description
-    st.caption("Cluster 0: Moderate income and low spending")
-
-    # This line displays the second segment description
-    st.caption("Cluster 1: Moderate income and high spending")
-
-    # This line displays the third segment description
-    st.caption("Cluster 2: High income and high spending")
-
-    # This line displays the fourth segment description
-    st.caption("Cluster 3: Low income and high spending")
-
-    # This line displays the fifth segment description
-    st.caption("Cluster 4: High income and low spending")
-
-    # This line closes the final summary container
-    st.markdown('</div>', unsafe_allow_html=True)
