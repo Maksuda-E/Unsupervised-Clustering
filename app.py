@@ -4,12 +4,6 @@ import streamlit as st
 # This line imports the prediction function
 from src.predict import predict_cluster
 
-# This line imports json for reading saved summary files if available
-import json
-
-# This line imports os for checking file paths
-import os
-
 # This line sets the page configuration
 st.set_page_config(
     page_title="Mall Customer Segmentation",
@@ -57,6 +51,7 @@ st.markdown(
     .segment-value {
         font-size: 1.5rem;
         font-weight: 800;
+        margin-bottom: 0.4rem;
     }
 
     div.stButton > button {
@@ -75,7 +70,10 @@ st.markdown(
 )
 
 # This line displays the title
-st.markdown('<div class="main-title">Mall Customer Segmentation App</div>', unsafe_allow_html=True)
+st.markdown(
+    '<div class="main-title">Mall Customer Segmentation App</div>',
+    unsafe_allow_html=True
+)
 
 # This line displays the subtitle
 st.markdown(
@@ -92,20 +90,21 @@ cluster_labels = {
     4: "High Income and Low Spending Customers"
 }
 
-# This line creates layout columns
-left_col, _ = st.columns([2, 1])
+# This line creates three columns to center the whole form section
+left_space, center_col, right_space = st.columns([1, 3, 1])
 
-# This block handles input section
-with left_col:
+# This block keeps all form content in the center column
+with center_col:
 
     # This line shows section title
     st.markdown('<div class="section-title">Customer Details</div>', unsafe_allow_html=True)
 
-    # This line creates inner columns
+    # This line creates inner columns for age and annual income
     col1, col2 = st.columns(2)
 
-    # First column inputs
+    # This block creates the first input column
     with col1:
+        # This line creates the age input
         age = st.number_input(
             "Age",
             min_value=1,
@@ -114,16 +113,9 @@ with left_col:
             step=1
         )
 
-        spending_score = st.slider(
-            "Spending Score",
-            min_value=0.0,
-            max_value=100.0,
-            value=50.0,
-            step=1.0
-        )
-
-    # Second column inputs
+    # This block creates the second input column
     with col2:
+        # This line creates the annual income input
         annual_income = st.number_input(
             "Annual Income",
             min_value=0.0,
@@ -131,24 +123,37 @@ with left_col:
             step=1.0
         )
 
-    # This line creates predict button
+    # This line creates the spending score slider below the two inputs
+    spending_score = st.slider(
+        "Spending Score",
+        min_value=0.0,
+        max_value=100.0,
+        value=50.0,
+        step=1.0
+    )
+
+    # This line adds some space before the button
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # This line creates the predict button
     if st.button("Predict Customer Segment"):
 
-        # This line prepares input data
+        # This line prepares input data for the model
         user_input = {
             "Age": age,
             "Annual_Income": annual_income,
             "Spending_Score": spending_score
         }
 
+        # This line starts the prediction block
         try:
-            # This line gets prediction
+            # This line gets the predicted cluster
             result = predict_cluster(user_input)
 
-            # This line gets cluster meaning
+            # This line gets the cluster meaning
             cluster_meaning = cluster_labels.get(result, "Unknown Customer Segment")
 
-            # This line displays result
+            # This line displays the prediction result card
             st.markdown(
                 f'''
                 <div class="segment-card">
@@ -159,10 +164,9 @@ with left_col:
                 unsafe_allow_html=True
             )
 
-            # This line shows explanation
-            st.info(
-                "Clusters represent groups of customers with similar behavior."
-            )
+            # This line shows a short explanation below the result
+            st.info("Clusters represent groups of customers with similar behavior.")
 
+        # This block handles prediction errors
         except Exception as exc:
             st.error(f"Prediction failed: {exc}")
