@@ -99,3 +99,11 @@ src.custom_exception.ProjectException: Error loading data: [Errno 2] No such fil
 2026-04-03 14:41:31,068 | INFO | unsupervised_clustering | Elbow scores calculated successfully
 2026-04-03 14:41:31,220 | INFO | unsupervised_clustering | Silhouette scores calculated successfully
 2026-04-03 14:41:31,272 | INFO | unsupervised_clustering | Training pipeline completed successfully
+2026-04-03 14:43:22,427 | INFO | unsupervised_clustering | Training pipeline started
+2026-04-03 14:43:22,428 | INFO | unsupervised_clustering | Loading dataset from data\mall_customers.csv
+2026-04-03 14:43:22,430 | INFO | unsupervised_clustering | Dataset loaded with shape (200, 5)
+2026-04-03 14:43:22,430 | INFO | unsupervised_clustering | Fitting scaler on columns: ['Age', 'Annual_Income', 'Spending_Score']
+2026-04-03 14:43:22,432 | INFO | unsupervised_clustering | Scaling completed successfully
+2026-04-03 14:43:24,431 | INFO | unsupervised_clustering | Elbow scores calculated successfully
+2026-04-03 14:43:24,604 | INFO | unsupervised_clustering | Silhouette scores calculated successfully
+2026-04-03 14:43:24,655 | INFO | unsupervised_clustering | Training pipeline completed successfully
