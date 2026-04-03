@@ -1,62 +1,63 @@
-import json
-
+# This line imports streamlit for the web app
 import streamlit as st
 
-from src.config import APP_TITLE
-from src.predict import predict_admission
+# This line imports the prediction function
+from src.predict import predict_cluster
 
-st.set_page_config(page_title=APP_TITLE, layout="centered")
-st.title(APP_TITLE)
-st.caption("Notebook-aligned MLP classifier for UCLA graduate admission prediction")
+# This line sets the page title and layout
+st.set_page_config(page_title="Mall Customer Segmentation", layout="centered")
 
-with st.form("prediction_form"):
-    col1, col2 = st.columns(2)
+# This line shows the app title
+st.title("Mall Customer Segmentation App")
 
-    with col1:
-        gre_score = st.number_input("GRE Score", min_value=260, max_value=340, value=320)
-        university_rating = st.selectbox("University Rating", [1, 2, 3, 4, 5])
-        lor = st.slider("LOR Strength", min_value=1.0, max_value=5.0, value=4.0, step=0.5)
-        research = st.selectbox(
-            "Research Experience",
-            [0, 1],
-            format_func=lambda x: "Yes" if x == 1 else "No",
-        )
+# This line shows a short description
+st.write("Enter customer details to predict the customer segment.")
 
-    with col2:
-        toefl_score = st.number_input("TOEFL Score", min_value=0, max_value=120, value=110)
-        sop = st.slider("SOP Strength", min_value=1.0, max_value=5.0, value=4.0, step=0.5)
-        cgpa = st.number_input("CGPA", min_value=0.0, max_value=10.0, value=8.5, step=0.01)
+# This line creates a numeric input for age
+age = st.number_input("Age", min_value=1, max_value=100, value=25, step=1)
 
-    submitted = st.form_submit_button("Predict")
+# This line creates a numeric input for annual income
+annual_income = st.number_input("Annual Income", min_value=0.0, value=60.0, step=1.0)
 
-if submitted:
+# This line creates a numeric input for spending score
+spending_score = st.number_input("Spending Score", min_value=0.0, max_value=100.0, value=50.0, step=1.0)
+
+# This line creates a dictionary to explain cluster meanings
+cluster_labels = {
+    0: "Moderate Income - Low Spending Customers",
+    1: "Moderate Income - High Spending Customers",
+    2: "High Income - High Spending Customers",
+    3: "Low Income - High Spending Customers",
+    4: "High Income - Low Spending Customers"
+}
+
+# This line checks if the Predict button is clicked
+if st.button("Predict Cluster"):
+    # This line creates the input dictionary
     user_input = {
-        "GRE_Score": gre_score,
-        "TOEFL_Score": toefl_score,
-        "University_Rating": university_rating,
-        "SOP": sop,
-        "LOR": lor,
-        "CGPA": cgpa,
-        "Research": research,
+        "Age": age,
+        "Annual_Income": annual_income,
+        "Spending_Score": spending_score
     }
 
+    # This line starts a try block
     try:
-        result = predict_admission(user_input)
+        # This line gets the predicted cluster
+        result = predict_cluster(user_input)
 
-        st.subheader(result["label"])
+        # This line gets the cluster meaning from the dictionary
+        cluster_meaning = cluster_labels.get(result, "Unknown Customer Segment")
 
-        if result["probability"] is not None:
-            percent = result["probability"] * 100
-            st.metric("Predicted probability for class = 1", f"{percent:.2f}%")
-            st.progress(max(0, min(100, int(round(percent)))))
-            st.caption(
-                "This is the model's probability for the positive class produced by predict_proba."
-            )
-        else:
-            st.info("Probability output is not available for this model.")
+        # This line displays the predicted cluster number
+        st.success(f"Predicted Customer Cluster: {result}")
 
-        with st.expander("Prediction details"):
-            st.code(json.dumps(result, indent=2), language="json")
+        # This line displays the cluster meaning
+        st.info(f"Segment: {cluster_meaning}")
 
+        # This line shows a note to explain cluster labels
+        st.write("Note: Cluster numbers are group labels created by KMeans. Customers in the same cluster have similar behavior.")
+
+    # This block handles app errors
     except Exception as exc:
+        # This line shows the error message
         st.error(f"Prediction failed: {exc}")

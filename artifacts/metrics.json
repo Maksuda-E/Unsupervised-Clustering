@@ -1,5 +1,5 @@
 {
-    "n_clusters": 6,
-    "silhouette_score": 0.4284167762892593,
-    "inertia": 133.86842085478855
+    "n_clusters": 5,
+    "silhouette_score": 0.41664341513732767,
+    "inertia": 168.24758017556834
 }

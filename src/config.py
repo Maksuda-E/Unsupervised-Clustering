@@ -1,19 +1,41 @@
-from pathlib import Path
+# This line imports the os module so we can work with folder paths
+import os
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_DIR = BASE_DIR / "data"
-ARTIFACTS_DIR = BASE_DIR / "artifacts"
-LOGS_DIR = BASE_DIR / "logs"
+# This line gets the absolute path of the current file
+CURRENT_FILE_PATH = os.path.abspath(__file__)
 
-DATA_FILE_PATH = DATA_DIR / "Admission_Predict_Ver1.1.csv"
+# This line gets the src folder path
+SRC_DIR = os.path.dirname(CURRENT_FILE_PATH)
 
-MODEL_FILE_PATH = ARTIFACTS_DIR / "model.pkl"
-SCALER_FILE_PATH = ARTIFACTS_DIR / "scaler.pkl"
-FEATURE_COLUMNS_FILE_PATH = ARTIFACTS_DIR / "feature_columns.pkl"
-METRICS_FILE_PATH = ARTIFACTS_DIR / "metrics.json"
+# This line gets the main project folder path
+PROJECT_DIR = os.path.dirname(SRC_DIR)
 
-RANDOM_STATE = 123
-TEST_SIZE = 0.20
-THRESHOLD = 0.80
+# This line creates the full path for the data folder
+DATA_DIR = os.path.join(PROJECT_DIR, "data")
 
-APP_TITLE = "UCLA Admission Predictor"
+# This line creates the full path for the artifacts folder
+ARTIFACTS_DIR = os.path.join(PROJECT_DIR, "artifacts")
+
+# This line creates the full path for the logs folder
+LOGS_DIR = os.path.join(PROJECT_DIR, "logs")
+
+# This line creates the full path for the dataset file
+DATA_FILE_PATH = os.path.join(DATA_DIR, "mall_customers.csv")
+
+# This line creates the full path for the saved clustering model file
+MODEL_FILE_PATH = os.path.join(ARTIFACTS_DIR, "clustering_model.pkl")
+
+# This line creates the full path for the saved scaler file
+SCALER_FILE_PATH = os.path.join(ARTIFACTS_DIR, "scaler.pkl")
+
+# This line creates the full path for the saved metrics file
+METRICS_FILE_PATH = os.path.join(ARTIFACTS_DIR, "metrics.json")
+
+# This line creates the full path for the log file
+LOG_FILE_PATH = os.path.join(LOGS_DIR, "project.log")
+
+# This line sets the random state for reproducibility
+RANDOM_STATE = 42
+
+# This line sets the number of clusters for the final model
+N_CLUSTERS = 5

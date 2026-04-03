@@ -42,15 +42,3 @@
 2026-03-26 14:22:04,304 INFO src.predict Cluster prediction completed successfully
 2026-03-26 14:22:34,223 INFO src.predict Model and scaler loaded successfully
 2026-03-26 14:22:34,225 INFO src.predict Cluster prediction completed successfully
-2026-04-03 12:32:49,354 INFO __main__ Main pipeline started
-2026-04-03 12:32:49,354 INFO src.data_loader Starting data loading from file
-2026-04-03 12:32:49,372 INFO src.data_loader Data loaded successfully
-2026-04-03 12:32:49,372 INFO src.preprocess Starting data cleaning
-2026-04-03 12:32:49,400 INFO src.preprocess Data cleaning completed successfully
-2026-04-03 12:32:49,400 INFO src.preprocess Selecting clustering features
-2026-04-03 12:32:49,404 INFO src.train Feature scaling started
-2026-04-03 12:32:49,409 INFO src.train Feature scaling completed successfully
-2026-04-03 12:32:49,409 INFO src.train KMeans model training started
-2026-04-03 12:32:52,417 INFO src.train KMeans model training completed successfully
-2026-04-03 12:32:52,422 INFO src.train Artifacts saved successfully
-2026-04-03 12:32:52,424 INFO __main__ Main pipeline completed successfully
