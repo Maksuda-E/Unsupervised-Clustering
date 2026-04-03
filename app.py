@@ -128,14 +128,14 @@ st.markdown(
     }
 
     .guide-title {
-        font-size: 1.8rem;
+        font-size: 1.45rem;
         font-weight: 800;
         color: #312e81;
         margin-bottom: 1.2rem;
     }
 
     .guide-item {
-        margin-bottom: 1rem;
+        margin-bottom: 0.8rem;
         color: #374151;
         line-height: 1.7;
     }
@@ -238,6 +238,27 @@ with center_col:
         #  creates the prediction button
         predict_button = st.button("Predict Customer Segment")
 
+        #  checks whether a previous prediction exists
+        if "mall_cluster_result" in st.session_state:
+
+            #  gets the stored cluster result
+            result = st.session_state["mall_cluster_result"]
+
+            #  gets the mapped segment name
+            segment_name = segment_labels.get(result, f"Cluster {result}")
+
+            #  displays the prediction result card under the button
+            st.markdown(
+                f"""
+                <div class="result-card">
+                    <div class="result-title">Predicted Segment</div>
+                    <div class="result-value">Cluster {result}</div>
+                    <div class="result-text">{segment_name}</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
     # This block creates the side overview section
     with side_col:
 
@@ -256,26 +277,26 @@ with center_col:
             unsafe_allow_html=True
         )
 
-        #  checks whether a previous prediction exists
-        if "mall_cluster_result" in st.session_state:
+        #  displays the segment guide under the overview
+        st.markdown(
+            f"""
+            <div class="guide-card">
+                <div class="guide-title">Segment Meaning Guide</div>
 
-            #  gets the stored cluster result
-            result = st.session_state["mall_cluster_result"]
+                <div class="guide-item"><b>Cluster 0:</b> {segment_labels.get(0)}</div>
+                <div class="guide-item"><b>Cluster 1:</b> {segment_labels.get(1)}</div>
+                <div class="guide-item"><b>Cluster 2:</b> {segment_labels.get(2)}</div>
+                <div class="guide-item"><b>Cluster 3:</b> {segment_labels.get(3)}</div>
+                <div class="guide-item"><b>Cluster 4:</b> {segment_labels.get(4)}</div>
+                <div class="guide-item"><b>Cluster 5:</b> {segment_labels.get(5)}</div>
 
-            #  gets the mapped segment name
-            segment_name = segment_labels.get(result, f"Cluster {result}")
-
-            #  displays the prediction result card
-            st.markdown(
-                f"""
-                <div class="result-card">
-                    <div class="result-title">Predicted Segment</div>
-                    <div class="result-value">Cluster {result}</div>
-                    <div class="result-text">{segment_name}</div>
+                <div class="guide-note">
+                    These descriptions are general cluster interpretations based on the trained clustering model.
                 </div>
-                """,
-                unsafe_allow_html=True
-            )
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     #  checks whether the prediction button has been clicked
     if predict_button:
@@ -302,24 +323,3 @@ with center_col:
         except Exception as exc:
             #  displays the error message
             st.error(f"Prediction failed: {exc}")
-
-
-# creates a section header
-st.markdown("### Segment Meaning Guide")
-
-# displays cluster explanations
-st.markdown(f"""
-Cluster 0: {segment_labels.get(0)}  
-
-Cluster 1: {segment_labels.get(1)}  
-
-Cluster 2: {segment_labels.get(2)}  
-
-Cluster 3: {segment_labels.get(3)}  
-
-Cluster 4: {segment_labels.get(4)}  
-
-Cluster 5: {segment_labels.get(5)}  
-
-Note: These descriptions are general cluster interpretations based on the trained clustering model.
-""")
