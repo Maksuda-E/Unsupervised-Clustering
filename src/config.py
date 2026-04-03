@@ -38,4 +38,4 @@ LOG_FILE_PATH = os.path.join(LOGS_DIR, "project.log")
 RANDOM_STATE = 42
 
 # This line sets the number of clusters for the final model
-N_CLUSTERS = 5
+N_CLUSTERS = 6
