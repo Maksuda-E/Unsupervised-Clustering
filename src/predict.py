@@ -1,5 +1,4 @@
 import pickle
-
 import pandas as pd
 
 from src.config import FEATURE_COLUMNS_FILE_PATH, MODEL_FILE_PATH, SCALER_FILE_PATH
@@ -9,41 +8,34 @@ from src.logger import get_logger
 logger = get_logger(__name__)
 
 
-def _load_pickle(path):
+def _load_pickle_file(path):
     with open(path, "rb") as f:
         return pickle.load(f)
 
 
-def load_prediction_artifacts():
+def load_artifacts():
     try:
-        logger.info("Loading prediction artifacts")
-        model = _load_pickle(MODEL_FILE_PATH)
-        scaler = _load_pickle(SCALER_FILE_PATH)
-        feature_columns = _load_pickle(FEATURE_COLUMNS_FILE_PATH)
-        logger.info("Prediction artifacts loaded successfully")
+        logger.info("Loading model artifacts for prediction.")
+        model = _load_pickle_file(MODEL_FILE_PATH)
+        scaler = _load_pickle_file(SCALER_FILE_PATH)
+        feature_columns = _load_pickle_file(FEATURE_COLUMNS_FILE_PATH)
+        logger.info("Artifacts loaded successfully.")
         return model, scaler, feature_columns
     except FileNotFoundError as exc:
-        logger.exception("One or more artifact files are missing")
+        logger.exception("Artifact file missing.")
         raise ProjectException(
-            "Artifacts not found. Run training first to generate model/scaler/features."
+            "Artifacts not found. Run training first to generate them."
         ) from exc
     except Exception as exc:
-        logger.exception("Error while loading prediction artifacts")
-        raise ProjectException("Failed to load prediction artifacts.") from exc
+        logger.exception("Unexpected error while loading artifacts.")
+        raise ProjectException("Failed to load model artifacts.") from exc
 
 
 def prepare_input_data(user_input: dict, feature_columns: list[str]) -> pd.DataFrame:
-    """
-    Match training preprocessing:
-    - raw columns
-    - cast University_Rating and Research as categorical
-    - pd.get_dummies
-    - align to training feature columns
-    """
     try:
-        logger.info("Preparing input data for prediction")
+        logger.info("Preparing user input for prediction.")
 
-        required_keys = {
+        required_fields = {
             "GRE_Score",
             "TOEFL_Score",
             "University_Rating",
@@ -53,7 +45,7 @@ def prepare_input_data(user_input: dict, feature_columns: list[str]) -> pd.DataF
             "Research",
         }
 
-        missing = required_keys.difference(user_input.keys())
+        missing = required_fields - set(user_input.keys())
         if missing:
             raise ProjectException(f"Missing user input fields: {sorted(missing)}")
 
@@ -70,31 +62,37 @@ def prepare_input_data(user_input: dict, feature_columns: list[str]) -> pd.DataF
 
         input_df = input_df.reindex(columns=feature_columns, fill_value=0)
 
-        logger.info("Input data prepared successfully")
+        logger.info("Input prepared successfully.")
         return input_df
 
     except ProjectException:
-        logger.exception("ProjectException while preparing input")
+        logger.exception("ProjectException while preparing input.")
         raise
     except Exception as exc:
-        logger.exception("Unexpected error while preparing input")
+        logger.exception("Unexpected error while preparing input.")
         raise ProjectException("Failed to prepare input data.") from exc
 
 
 def predict_admission(user_input: dict) -> dict:
     """
-    Returns both class and probability so app.py can show a true percentage.
+    Returns:
+    {
+        "predicted_class": 0 or 1,
+        "label": "...",
+        "probability": float | None
+    }
     """
     try:
-        model, scaler, feature_columns = load_prediction_artifacts()
-        prepared_input = prepare_input_data(user_input, feature_columns)
-        scaled_input = scaler.transform(prepared_input)
+        logger.info("Starting prediction.")
+        model, scaler, feature_columns = load_artifacts()
+        input_df = prepare_input_data(user_input, feature_columns)
+        input_scaled = scaler.transform(input_df)
 
-        predicted_class = int(model.predict(scaled_input)[0])
+        predicted_class = int(model.predict(input_scaled)[0])
 
         probability = None
         if hasattr(model, "predict_proba"):
-            probability = float(model.predict_proba(scaled_input)[0][1])
+            probability = float(model.predict_proba(input_scaled)[0][1])
 
         result = {
             "predicted_class": predicted_class,
@@ -106,11 +104,11 @@ def predict_admission(user_input: dict) -> dict:
             "probability": probability,
         }
 
-        logger.info("Prediction completed successfully: %s", result)
+        logger.info("Prediction successful: %s", result)
         return result
 
     except ProjectException:
         raise
     except Exception as exc:
-        logger.exception("Unexpected error during prediction")
-        raise ProjectException("Prediction failed.") from exc
+        logger.exception("Unexpected prediction error.")
+        raise ProjectException("Failed to predict admission status.") from exc

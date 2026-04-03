@@ -1,13 +1,12 @@
 import logging
 from logging.handlers import RotatingFileHandler
-from pathlib import Path
 
 from src.config import LOGS_DIR
 
 LOG_FILE_NAME = "project.log"
 
 
-def _build_root_logger() -> logging.Logger:
+def _configure_root_logger() -> logging.Logger:
     LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
     logger = logging.getLogger("ucla_nn")
@@ -22,7 +21,7 @@ def _build_root_logger() -> logging.Logger:
     )
 
     file_handler = RotatingFileHandler(
-        Path(LOGS_DIR) / LOG_FILE_NAME,
+        LOGS_DIR / LOG_FILE_NAME,
         maxBytes=1_000_000,
         backupCount=3,
         encoding="utf-8",
@@ -37,9 +36,10 @@ def _build_root_logger() -> logging.Logger:
     logger.addHandler(file_handler)
     logger.addHandler(console_handler)
     logger.propagate = False
+
     return logger
 
 
 def get_logger(name: str) -> logging.Logger:
-    root_logger = _build_root_logger()
+    root_logger = _configure_root_logger()
     return root_logger.getChild(name)
