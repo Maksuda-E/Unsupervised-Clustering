@@ -37,6 +37,14 @@ def inject_css() -> None:
     st.markdown(
         """
         <style>
+        /* REMOVE HEADER */
+        header {visibility: hidden;}
+
+        /* REMOVE TOP SPACE */
+        .block-container {
+            padding-top: 1rem !important;
+        }
+
         .main {
             background: linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%);
         }
