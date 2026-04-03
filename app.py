@@ -246,7 +246,3 @@ with center_col:
             #  displays the error message
             st.error(f"Prediction failed: {exc}")
 
-#  shows a short explanation under the main layout
-st.info(
-    "This segmentation app uses Age, Annual Income, and Spending Score for clustering."
-)
