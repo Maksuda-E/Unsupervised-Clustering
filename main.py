@@ -33,10 +33,10 @@ def main():
         x = select_features(df_clean)
 
         # This line trains the clustering model
-        model, scaler, metrics = train_model(x)
+        model, scaler, metrics, cluster_mapping = train_model(x)
 
         # This line saves the artifacts
-        save_artifacts(model, scaler, metrics)
+        save_artifacts(model, scaler, metrics, cluster_mapping)
 
         # This line prints success message
         print("Training completed successfully")
