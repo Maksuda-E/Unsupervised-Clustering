@@ -1,0 +1,26 @@
+{
+    "0": {
+        "segment_name": "High income low spending",
+        "meaning": "Customers who earn a lot but spend less."
+    },
+    "1": {
+        "segment_name": "Older average customers",
+        "meaning": "Older customers with medium income and medium spending."
+    },
+    "2": {
+        "segment_name": "Low income high spending",
+        "meaning": "Customers who earn less but still spend more."
+    },
+    "3": {
+        "segment_name": "High income high spending",
+        "meaning": "Customers who earn a lot and spend a lot."
+    },
+    "4": {
+        "segment_name": "Young average customers",
+        "meaning": "Younger customers with medium income and medium spending."
+    },
+    "5": {
+        "segment_name": "Low income low spending",
+        "meaning": "Customers who earn less and spend less."
+    }
+}
