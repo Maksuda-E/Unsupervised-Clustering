@@ -1,47 +1,47 @@
-# This line imports json for loading cluster mapping
+#  imports json for loading cluster mapping
 import json
 
-# This line imports os for file path checking
+#  imports os for file path checking
 import os
 
-# This line imports streamlit for the web app
+#  imports streamlit for the web app
 import streamlit as st
 
-# This line imports the prediction function
+#  imports the prediction function
 from src.predict import predict_cluster
 
-# This line sets the page configuration
+#  sets the page configuration
 st.set_page_config(
     page_title="Mall Customer Segmentation",
     layout="wide"
 )
 
-# This line defines the cluster mapping file path
+#  defines the cluster mapping file path
 CLUSTER_MAPPING_FILE_PATH = "artifacts/cluster_mapping.json"
 
 # This function loads saved cluster mapping if available
 def load_cluster_mapping():
-    # This line checks whether the mapping file exists
+    #  checks whether the mapping file exists
     if os.path.exists(CLUSTER_MAPPING_FILE_PATH):
-        # This line opens the mapping file
+        #  opens the mapping file
         with open(CLUSTER_MAPPING_FILE_PATH, "r", encoding="utf-8") as file:
-            # This line loads the mapping data
+            #  loads the mapping data
             mapping = json.load(file)
 
-        # This line converts mapping keys back to integers
+        #  converts mapping keys back to integers
         return {int(key): value for key, value in mapping.items()}
 
-    # This line returns default neutral mapping if file does not exist
+    #  returns default neutral mapping if file does not exist
     return {
-        0: "Customer Segment A",
-        1: "Customer Segment B",
-        2: "Customer Segment C",
-        3: "Customer Segment D",
-        4: "Customer Segment E",
-        5: "Customer Segment F"
+        0: "Balanced customers with moderate income and spending behavior.",
+        1: "Higher income customers with relatively lower spending behavior.",
+        2: "High income customers with high spending behavior.",
+        3: "Lower income customers with higher spending behavior.",
+        4: "Lower income customers with lower spending behavior.",
+        5: "Moderate or age-driven steady spending customers."
     }
 
-# This line adds custom CSS styling for a new design and color theme
+#  adds custom CSS styling for a new design and color theme
 st.markdown(
     """
     <style>
@@ -118,6 +118,39 @@ st.markdown(
         opacity: 0.96;
     }
 
+    .guide-card {
+        background: rgba(255, 255, 255, 0.80);
+        border: 1px solid rgba(196, 181, 253, 0.45);
+        border-radius: 22px;
+        padding: 24px;
+        margin-top: 1.5rem;
+        box-shadow: 0 12px 28px rgba(76, 29, 149, 0.10);
+    }
+
+    .guide-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #312e81;
+        margin-bottom: 1.2rem;
+    }
+
+    .guide-item {
+        margin-bottom: 1rem;
+        color: #374151;
+        line-height: 1.7;
+    }
+
+    .guide-item b {
+        color: #4c1d95;
+    }
+
+    .guide-note {
+        margin-top: 1rem;
+        color: #4b5563;
+        font-size: 0.98rem;
+        line-height: 1.7;
+    }
+
     div.stButton > button {
         width: 100%;
         height: 50px;
@@ -138,37 +171,37 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# This line loads the segment labels from saved mapping
+#  loads the segment labels from saved mapping
 segment_labels = load_cluster_mapping()
 
-# This line displays the main title
+#  displays the main title
 st.markdown(
     '<div class="main-title">Mall Customer Segmentation App</div>',
     unsafe_allow_html=True
 )
 
-# This line displays the subtitle
+#  displays the subtitle
 st.markdown(
     '<div class="sub-title">Enter customer details to predict the customer segment</div>',
     unsafe_allow_html=True
 )
 
-# This line creates a centered page layout
+#  creates a centered page layout
 left_space, center_col, right_space = st.columns([0.6, 4, 0.6])
 
 # This block contains the main layout
 with center_col:
 
-    # This line creates two columns for the form and side panel
+    #  creates two columns for the form and side panel
     form_col, side_col = st.columns([2.1, 1], gap="large")
 
     # This block creates the form section
     with form_col:
 
-        # This line displays the section title
+        #  displays the section title
         st.markdown('<div class="section-title">Customer Details</div>', unsafe_allow_html=True)
 
-        # This line creates two columns for age and annual income
+        #  creates two columns for age and annual income
         row1_col1, row1_col2 = st.columns(2)
 
         # This block creates the age input
@@ -190,7 +223,7 @@ with center_col:
                 step=1.0
             )
 
-        # This line creates the spending score slider
+        #  creates the spending score slider
         spending_score = st.slider(
             "Spending Score",
             min_value=0.0,
@@ -199,16 +232,16 @@ with center_col:
             step=1.0
         )
 
-        # This line adds spacing before the button
+        #  adds spacing before the button
         st.markdown("<br>", unsafe_allow_html=True)
 
-        # This line creates the prediction button
+        #  creates the prediction button
         predict_button = st.button("Predict Customer Segment")
 
     # This block creates the side overview section
     with side_col:
 
-        # This line displays the overview card
+        #  displays the overview card
         st.markdown(
             f"""
             <div class="summary-card">
@@ -223,16 +256,16 @@ with center_col:
             unsafe_allow_html=True
         )
 
-        # This line checks whether a previous prediction exists
+        #  checks whether a previous prediction exists
         if "mall_cluster_result" in st.session_state:
 
-            # This line gets the stored cluster result
+            #  gets the stored cluster result
             result = st.session_state["mall_cluster_result"]
 
-            # This line gets the mapped segment name
-            segment_name = segment_labels.get(result, f"Customer Segment {result}")
+            #  gets the mapped segment name
+            segment_name = segment_labels.get(result, f"Cluster {result}")
 
-            # This line displays the prediction result card
+            #  displays the prediction result card
             st.markdown(
                 f"""
                 <div class="result-card">
@@ -244,56 +277,72 @@ with center_col:
                 unsafe_allow_html=True
             )
 
-    # This line checks whether the prediction button has been clicked
+    #  checks whether the prediction button has been clicked
     if predict_button:
 
-        # This line prepares the model input dictionary
+        #  prepares the model input dictionary
         user_input = {
             "Age": age,
             "Annual_Income": annual_income,
             "Spending_Score": spending_score
         }
 
-        # This line starts the safe prediction block
+        #  starts the safe prediction block
         try:
-            # This line gets the predicted cluster
+            #  gets the predicted cluster
             result = predict_cluster(user_input)
 
-            # This line stores the result in session state
+            #  stores the result in session state
             st.session_state["mall_cluster_result"] = result
 
-            # This line reruns the app so the result appears immediately
+            #  reruns the app so the result appears immediately
             st.rerun()
 
         # This block handles prediction errors
         except Exception as exc:
-            # This line displays the error message
+            #  displays the error message
             st.error(f"Prediction failed: {exc}")
 
-# This line shows a short note under the app
-# This line shows explanation of what each segment means
+#  shows explanation of what each cluster means in a styled card
 st.markdown(
-    """
-### Segment Meaning Guide
+    f"""
+    <div class="guide-card">
+        <div class="guide-title">Segment Meaning Guide</div>
 
-**Customer Segment A**  
-Balanced customers with moderate income and spending behavior.
+        <div class="guide-item">
+            <b>Cluster 0</b><br>
+            {segment_labels.get(0, "Customer behavior pattern for cluster 0.")}
+        </div>
 
-**Customer Segment B**  
-Higher income customers with relatively lower spending behavior.
+        <div class="guide-item">
+            <b>Cluster 1</b><br>
+            {segment_labels.get(1, "Customer behavior pattern for cluster 1.")}
+        </div>
 
-**Customer Segment C**  
-High income customers with high spending behavior.
+        <div class="guide-item">
+            <b>Cluster 2</b><br>
+            {segment_labels.get(2, "Customer behavior pattern for cluster 2.")}
+        </div>
 
-**Customer Segment D**  
-Lower income customers with higher spending behavior.
+        <div class="guide-item">
+            <b>Cluster 3</b><br>
+            {segment_labels.get(3, "Customer behavior pattern for cluster 3.")}
+        </div>
 
-**Customer Segment E**  
-Lower income customers with lower spending behavior.
+        <div class="guide-item">
+            <b>Cluster 4</b><br>
+            {segment_labels.get(4, "Customer behavior pattern for cluster 4.")}
+        </div>
 
-**Customer Segment F**  
-Moderate or age-driven steady spending customers.
+        <div class="guide-item">
+            <b>Cluster 5</b><br>
+            {segment_labels.get(5, "Customer behavior pattern for cluster 5.")}
+        </div>
 
-**Note:** These are general explanations. Exact segment meaning depends on the trained clustering model.
-    """
+        <div class="guide-note">
+            <b>Note:</b> These descriptions are general cluster interpretations based on the trained clustering model.
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True
 )
