@@ -191,7 +191,7 @@ with center_col:
                 <div class="summary-title">Customer Overview</div>
                 <div class="summary-text">
                     This customer is {age} years old, has an annual income of {annual_income:.0f}, and a spending score of {spending_score:.0f}.
-                    Based on the notebook flow, these are the three features used by the clustering model to assign the customer to one of six groups.
+                    These are the three features used by the clustering model to assign the customer to one of six groups.
                     The segment helps describe similar shopping behavior patterns for targeting and analysis.
                 </div>
             </div>
