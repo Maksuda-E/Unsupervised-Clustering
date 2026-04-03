@@ -248,5 +248,5 @@ with center_col:
 
 #  shows a short explanation under the main layout
 st.info(
-    "This segmentation app follows the notebook flow that uses Age, Annual Income, and Spending Score for clustering."
+    "This segmentation app uses Age, Annual Income, and Spending Score for clustering."
 )
