@@ -304,6 +304,10 @@ with center_col:
             st.error(f"Prediction failed: {exc}")
 
 # This line shows explanation of what each cluster means in a styled card
+# This line forces Streamlit to properly render HTML
+st.markdown("", unsafe_allow_html=True)
+
+# This line shows explanation of what each cluster means in a styled card
 st.markdown(
     f"""
     <div class="guide-card">
@@ -311,32 +315,32 @@ st.markdown(
 
         <div class="guide-item">
             <b>Cluster 0</b><br>
-            {segment_labels.get(0, "Customer behavior pattern for cluster 0.")}
+            {segment_labels.get(0)}
         </div>
 
         <div class="guide-item">
             <b>Cluster 1</b><br>
-            {segment_labels.get(1, "Customer behavior pattern for cluster 1.")}
+            {segment_labels.get(1)}
         </div>
 
         <div class="guide-item">
             <b>Cluster 2</b><br>
-            {segment_labels.get(2, "Customer behavior pattern for cluster 2.")}
+            {segment_labels.get(2)}
         </div>
 
         <div class="guide-item">
             <b>Cluster 3</b><br>
-            {segment_labels.get(3, "Customer behavior pattern for cluster 3.")}
+            {segment_labels.get(3)}
         </div>
 
         <div class="guide-item">
             <b>Cluster 4</b><br>
-            {segment_labels.get(4, "Customer behavior pattern for cluster 4.")}
+            {segment_labels.get(4)}
         </div>
 
         <div class="guide-item">
             <b>Cluster 5</b><br>
-            {segment_labels.get(5, "Customer behavior pattern for cluster 5.")}
+            {segment_labels.get(5)}
         </div>
 
         <div class="guide-note">
