@@ -271,54 +271,29 @@ with center_col:
             st.error(f"Prediction failed: {exc}")
 
 # This line shows a short note under the app
-st.info(
-    # This line shows explanation of what each segment means
-
-)
+# This line shows explanation of what each segment means
 st.markdown(
     """
-<<<<<<< HEAD
-    <div style="background:#ffffff; padding:20px; border-radius:16px; margin-top:20px;">
-    <h4>Segment Meaning Guide</h4>
+### Segment Meaning Guide
 
-    <b>Segment A:</b> Balanced customers<br>
-    <b>Segment B:</b> High income low spending<br>
-    <b>Segment C:</b> High income high spending<br>
-    <b>Segment D:</b> Low income high spending<br>
-    <b>Segment E:</b> Low income low spending<br>
-    <b>Segment F:</b> Moderate or older customers<br>
+**Customer Segment A**  
+Balanced customers with moderate income and spending behavior.
 
-    <br>
-    <small>Note: These are general interpretations based on clustering behavior.</small>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-=======
-    ### Segment Meaning Guide
+**Customer Segment B**  
+Higher income customers with relatively lower spending behavior.
 
-    These segments are created using clustering on Age, Annual Income, and Spending Score.
-    Each segment represents a group of customers with similar behavior patterns.
+**Customer Segment C**  
+High income customers with high spending behavior.
 
-    **Customer Segment A**  
-    Typically represents customers with balanced income and spending behavior.
+**Customer Segment D**  
+Lower income customers with higher spending behavior.
 
-    **Customer Segment B**  
-    Often includes customers with higher income but relatively lower spending.
+**Customer Segment E**  
+Lower income customers with lower spending behavior.
 
-    **Customer Segment C**  
-    Usually indicates high income customers who also spend more frequently.
+**Customer Segment F**  
+Moderate or age-driven steady spending customers.
 
-    **Customer Segment D**  
-    Represents customers with lower income but higher spending tendencies.
-
-    **Customer Segment E**  
-    Includes customers with lower income and lower spending behavior.
-
-    **Customer Segment F**  
-    Often corresponds to older or moderate income customers with steady spending patterns.
-
-    Note: These meanings are general interpretations. Exact segment behavior depends on the trained model.
+**Note:** These are general explanations. Exact segment meaning depends on the trained clustering model.
     """
 )
->>>>>>> 906b11eaf54209cd71ea8cc74ac51c1839bf9819
