@@ -4,17 +4,17 @@ import os
 
 # Create a class to store dataset settings.
 class DataConfig:
-    # Store the correct dataset path from the project root.
+    # Store the correct dataset path.
     DATA_PATH = os.path.join("data", "mall_customers.csv")
 
 
 # Create a class to store model settings.
 class ModelConfig:
-    # Set a fixed random seed for reproducible results.
+    # Set a fixed random seed.
     RANDOM_STATE = 42
 
-    # Keep 5 clusters based on the notebook segment explanation.
-    N_CLUSTERS = 5
+    # Use 6 clusters to match the notebook final 3 feature conclusion.
+    N_CLUSTERS = 6
 
     # Set centroid initialization method.
     INIT = "k-means++"
@@ -22,17 +22,17 @@ class ModelConfig:
     # Set the number of initializations.
     N_INIT = 20
 
-    # Set the maximum number of iterations.
+    # Set the maximum iterations.
     MAX_ITER = 300
 
-    # Store the model feature columns.
+    # Store the final model features.
     FEATURE_COLUMNS = ["Age", "Annual_Income", "Spending_Score"]
 
-    # Store the notebook visual clustering columns.
+    # Store the 2 feature notebook exploration columns.
     NOTEBOOK_SEGMENT_COLUMNS = ["Annual_Income", "Spending_Score"]
 
 
-# Create a class to store artifact file paths.
+# Create a class to store artifact paths.
 class ArtifactConfig:
     # Define the artifacts folder.
     ARTIFACT_DIR = "artifacts"
@@ -49,10 +49,10 @@ class ArtifactConfig:
     # Store the clustered training data path.
     CLUSTERED_DATA_PATH = os.path.join(ARTIFACT_DIR, "train_clustered_data.csv")
 
-    # Store the cluster profile path.
+    # Store the cluster profile csv path.
     CLUSTER_PROFILE_PATH = os.path.join(ARTIFACT_DIR, "cluster_profiles.csv")
 
-    # Store the segment JSON path.
+    # Store the segment profile json path.
     SEGMENT_PROFILE_PATH = os.path.join(ARTIFACT_DIR, "segment_profiles.json")
 
     # Store elbow scores path.
@@ -64,8 +64,8 @@ class ArtifactConfig:
 
 # Create a class for app settings.
 class AppConfig:
-    # Reuse the saved segment profile path.
+    # Reuse saved segment profile path.
     SEGMENT_PROFILE_PATH = ArtifactConfig.SEGMENT_PROFILE_PATH
 
-    # Reuse the clustered data path.
+    # Reuse clustered data path.
     CLUSTERED_DATA_PATH = ArtifactConfig.CLUSTERED_DATA_PATH
