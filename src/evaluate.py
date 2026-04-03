@@ -1,55 +1,116 @@
-# This line imports json for saving metrics in JSON format
-import json
+# Import pandas for creating result tables.
+import pandas as pd
 
-# This line imports evaluation metrics from sklearn
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+# Import KMeans for clustering.
+from sklearn.cluster import KMeans
 
-# This line imports the metrics file path
-from src.config import METRICS_FILE_PATH
+# Import silhouette_score for cluster evaluation.
+from sklearn.metrics import silhouette_score
 
-# This line imports the logger
-from src.logger import get_logger
-
-# This line imports the custom exception
+# Import custom exception handling.
 from src.custom_exception import ProjectException
 
-# This line creates a logger for this file
-logger = get_logger(__name__)
+# Import logger.
+from src.logger import logger
 
-# This function evaluates the model
-def evaluate_model(model, x_test, y_test):
-    # This line starts the try block
-    try:
-        # This line logs that evaluation has started
-        logger.info("Model evaluation started")
 
-        # This line predicts values for the test data
-        predictions = model.predict(x_test)
+# Create a class to calculate clustering evaluation scores.
+class ClusterEvaluator:
+    # Define the constructor.
+    def __init__(self, random_state: int, init: str, n_init: int, max_iter: int):
+        # Save random state.
+        self.random_state = random_state
 
-        # This line calculates all performance metrics
-        metrics = {
-            "accuracy": float(accuracy_score(y_test, predictions)),
-            "precision": float(precision_score(y_test, predictions)),
-            "recall": float(recall_score(y_test, predictions)),
-            "f1_score": float(f1_score(y_test, predictions)),
-            "confusion_matrix": confusion_matrix(y_test, predictions).tolist()
-        }
+        # Save initialization method.
+        self.init = init
 
-        # This line opens the metrics file in write mode
-        with open(METRICS_FILE_PATH, "w", encoding="utf-8") as file:
-            # This line saves the metrics dictionary as JSON
-            json.dump(metrics, file, indent=4)
+        # Save n_init value.
+        self.n_init = n_init
 
-        # This line logs that evaluation is complete
-        logger.info("Model evaluation completed successfully")
+        # Save max iterations.
+        self.max_iter = max_iter
 
-        # This line returns the metrics
-        return metrics
+    # Create a method to calculate elbow scores.
+    def calculate_elbow(self, X, k_range) -> pd.DataFrame:
+        # Start a try block.
+        try:
+            # Create an empty list for result rows.
+            rows = []
 
-    # This block handles evaluation errors
-    except Exception as exc:
-        # This line logs the error
-        logger.error("Error occurred during model evaluation")
+            # Loop through each cluster number.
+            for k in k_range:
+                # Create the KMeans model.
+                model = KMeans(
+                    n_clusters=k,
+                    random_state=self.random_state,
+                    init=self.init,
+                    n_init=self.n_init,
+                    max_iter=self.max_iter,
+                )
 
-        # This line raises a custom exception
-        raise ProjectException(f"Failed to evaluate model: {exc}")
+                # Fit the model on the input data.
+                model.fit(X)
+
+                # Save the inertia value for this k.
+                rows.append({"cluster": k, "WCSS_Score": round(model.inertia_, 6)})
+
+            # Convert the result list into a dataframe.
+            result = pd.DataFrame(rows)
+
+            # Log completion.
+            logger.info("Elbow scores calculated successfully")
+
+            # Return the dataframe.
+            return result
+
+        # Catch evaluation errors.
+        except Exception as exc:
+            # Log the full error.
+            logger.exception("Elbow calculation failed")
+
+            # Raise a project specific exception.
+            raise ProjectException(f"Error calculating elbow scores: {exc}") from exc
+
+    # Create a method to calculate silhouette scores.
+    def calculate_silhouette(self, X, k_range) -> pd.DataFrame:
+        # Start a try block.
+        try:
+            # Create an empty list for result rows.
+            rows = []
+
+            # Loop through each cluster number.
+            for k in k_range:
+                # Create the KMeans model.
+                model = KMeans(
+                    n_clusters=k,
+                    random_state=self.random_state,
+                    init=self.init,
+                    n_init=self.n_init,
+                    max_iter=self.max_iter,
+                )
+
+                # Fit the model and get cluster labels.
+                labels = model.fit_predict(X)
+
+                # Calculate silhouette score.
+                score = silhouette_score(X, labels)
+
+                # Save the result row.
+                rows.append({"cluster": k, "Silhouette_Score": round(score, 6)})
+
+            # Convert the results into a dataframe.
+            result = pd.DataFrame(rows)
+
+            # Log completion.
+            logger.info("Silhouette scores calculated successfully")
+
+            # Return the dataframe.
+            return result
+
+        # Catch evaluation errors.
+        except Exception as exc:
+            # Log the full error.
+            logger.exception("Silhouette calculation failed")
+
+            # Raise a project specific exception.
+            raise ProjectException(f"Error calculating silhouette scores: {exc}") from exc

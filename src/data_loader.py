@@ -1,35 +1,40 @@
-# This line imports pandas for reading the dataset
+# Import pandas for CSV loading.
 import pandas as pd
 
-# This line imports the logger function
-from src.logger import get_logger
-
-# This line imports the custom project exception
+# Import the custom exception class.
 from src.custom_exception import ProjectException
 
-# This line creates a logger for this file
-logger = get_logger(__name__)
+# Import the logger object.
+from src.logger import logger
 
-# This function loads the CSV dataset
-def load_data(file_path: str) -> pd.DataFrame:
-    # This line starts a try block for safe execution
-    try:
-        # This line logs that data loading has started
-        logger.info("Starting data loading from file")
 
-        # This line reads the CSV file into a pandas DataFrame
-        df = pd.read_csv(file_path)
+# Create a class to manage dataset loading.
+class DataLoader:
+    # Define the constructor.
+    def __init__(self, data_path: str):
+        # Save the file path in the object.
+        self.data_path = data_path
 
-        # This line logs that data loading finished successfully
-        logger.info("Data loaded successfully")
+    # Create a method to load the dataset.
+    def load_data(self) -> pd.DataFrame:
+        # Start a try block for safe loading.
+        try:
+            # Log the dataset loading start.
+            logger.info("Loading dataset from %s", self.data_path)
 
-        # This line returns the loaded DataFrame
-        return df
+            # Read the CSV file.
+            df = pd.read_csv(self.data_path)
 
-    # This block handles any exception during file loading
-    except Exception as exc:
-        # This line logs the error message
-        logger.error("Error occurred while loading data")
+            # Log the loaded dataset shape.
+            logger.info("Dataset loaded with shape %s", df.shape)
 
-        # This line raises a custom project exception
-        raise ProjectException(f"Failed to load data: {exc}")
+            # Return the dataframe.
+            return df
+
+        # Catch any loading error.
+        except Exception as exc:
+            # Write the full exception to the log.
+            logger.exception("Failed to load dataset")
+
+            # Raise a cleaner project specific exception.
+            raise ProjectException(f"Error loading data: {exc}") from exc

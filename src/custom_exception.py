@@ -1,9 +1,14 @@
-# This class creates a custom exception for the project
+# Create a custom exception class for the project.
 class ProjectException(Exception):
-    # This function initializes the custom exception
+    # Define the constructor.
     def __init__(self, message: str):
-        # This line calls the parent Exception class
+        # Pass the message to the parent Exception class.
         super().__init__(message)
 
-        # This line stores the error message
+        # Save the message in the object.
         self.message = message
+
+    # Define how the exception is displayed as text.
+    def __str__(self) -> str:
+        # Return the custom error message.
+        return self.message

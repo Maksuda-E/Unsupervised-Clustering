@@ -1,91 +1,98 @@
-# This line imports pickle for loading saved objects
-import pickle
-
-# This line imports pandas for creating input DataFrame
+# Import pandas for building single row input data.
 import pandas as pd
 
-# This line imports model and scaler paths
-from src.config import MODEL_FILE_PATH, SCALER_FILE_PATH
+# Import artifact and model configuration.
+from src.config import ArtifactConfig, ModelConfig
 
-# This line imports the logger
-from src.logger import get_logger
-
-# This line imports the custom exception
+# Import custom exception handling.
 from src.custom_exception import ProjectException
 
-# This line creates a logger for this file
-logger = get_logger(__name__)
+# Import logger.
+from src.logger import logger
 
-# This function loads the saved model and scaler
-def load_model_and_scaler():
-    # This line starts the try block
-    try:
-        # This line opens the model file
-        with open(MODEL_FILE_PATH, "rb") as model_file:
-            model = pickle.load(model_file)
+# Import the object loader utility.
+from src.utils import load_object
 
-        # This line opens the scaler file
-        with open(SCALER_FILE_PATH, "rb") as scaler_file:
-            scaler = pickle.load(scaler_file)
 
-        # This line logs successful loading
-        logger.info("Model and scaler loaded successfully")
+# Create a predictor class for app use.
+class ClusterPredictor:
+    # Define the constructor.
+    def __init__(self):
+        # Start a try block.
+        try:
+            # Load the trained KMeans model.
+            self.model = load_object(ArtifactConfig.MODEL_PATH)
 
-        # This line returns the loaded objects
-        return model, scaler
+            # Load the fitted scaler.
+            self.scaler = load_object(ArtifactConfig.SCALER_PATH)
 
-    # This block handles loading errors
-    except Exception as exc:
-        # This line logs the error
-        logger.error("Error occurred while loading model or scaler")
+            # Log success.
+            logger.info("Prediction artifacts loaded successfully")
 
-        # This line raises a custom exception
-        raise ProjectException(f"Failed to load model artifacts: {exc}")
+        # Catch artifact loading errors.
+        except Exception as exc:
+            # Log the full exception.
+            logger.exception("Failed to load prediction artifacts")
 
-# This function prepares user input for prediction
-def prepare_input_data(user_input: dict):
-    # This line starts the try block
-    try:
-        # This line creates a DataFrame from user input
-        input_df = pd.DataFrame([user_input])
+            # Raise a clean project error.
+            raise ProjectException(
+                "Could not load model artifacts. Run python main.py first."
+            ) from exc
 
-        # This line returns the prepared input
+    # Create a method to prepare input data.
+    def _prepare_input(
+        self,
+        age: int,
+        annual_income: int,
+        spending_score: int,
+        gender: str | None = None,
+    ) -> pd.DataFrame:
+        # Build a one row dataframe with model feature names.
+        input_df = pd.DataFrame(
+            {
+                "Age": [age],
+                "Annual_Income": [annual_income],
+                "Spending_Score": [spending_score],
+            }
+        )
+
+        # Return the prepared dataframe.
         return input_df
 
-    # This block handles preparation errors
-    except Exception as exc:
-        # This line logs the error
-        logger.error("Error occurred while preparing input data")
+    # Create a method to predict a single customer cluster.
+    def predict_single(
+        self,
+        age: int,
+        annual_income: int,
+        spending_score: int,
+        gender: str | None = None,
+    ) -> int:
+        # Start a try block.
+        try:
+            # Prepare the input dataframe.
+            input_df = self._prepare_input(
+                age=age,
+                annual_income=annual_income,
+                spending_score=spending_score,
+                gender=gender,
+            )
 
-        # This line raises a custom exception
-        raise ProjectException(f"Failed to prepare input data: {exc}")
+            # Scale the input using the saved scaler.
+            scaled_input = self.scaler.transform(input_df[ModelConfig.FEATURE_COLUMNS])
 
-# This function predicts the cluster
-def predict_cluster(user_input: dict):
-    # This line starts the try block
-    try:
-        # This line loads the model and scaler
-        model, scaler = load_model_and_scaler()
+            # Predict the cluster id.
+            prediction = self.model.predict(scaled_input)[0]
 
-        # This line prepares input data
-        input_df = prepare_input_data(user_input)
+            # Log prediction success.
+            logger.info("Prediction completed successfully")
 
-        # This line scales the input data
-        input_scaled = scaler.transform(input_df)
+            # Return the prediction as an integer.
+            return int(prediction)
 
-        # This line predicts the cluster
-        cluster = model.predict(input_scaled)[0]
+        # Catch prediction errors.
+        except Exception as exc:
+            # Log the full exception.
+            logger.exception("Prediction failed")
 
-        # This line logs prediction success
-        logger.info("Cluster prediction completed successfully")
-
-        # This line returns the cluster as integer
-        return int(cluster)
-
-    # This block handles prediction errors
-    except Exception as exc:
-        # This line logs the error
-        logger.error("Error occurred during cluster prediction")
-
-        # This line raises a custom exception
-        raise ProjectException(f"Failed to predict cluster: {exc}")
+            # Raise a project specific exception.
+            raise ProjectException(f"Prediction failed: {exc}") from exc

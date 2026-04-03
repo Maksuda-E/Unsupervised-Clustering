@@ -42,3 +42,52 @@
 2026-03-26 14:22:04,304 INFO src.predict Cluster prediction completed successfully
 2026-03-26 14:22:34,223 INFO src.predict Model and scaler loaded successfully
 2026-03-26 14:22:34,225 INFO src.predict Cluster prediction completed successfully
+2026-04-03 14:37:22,390 | INFO | unsupervised_clustering | Training pipeline started
+2026-04-03 14:37:22,390 | INFO | unsupervised_clustering | Loading dataset from mall_customers.csv
+2026-04-03 14:37:22,393 | ERROR | unsupervised_clustering | Failed to load dataset
+Traceback (most recent call last):
+  File "C:\Users\afrin\OneDrive\Documents\GitHub\Unsupervised-Clustering\src\data_loader.py", line 26, in load_data
+    df = pd.read_csv(self.data_path)
+  File "C:\Users\afrin\AppData\Roaming\Python\Python310\site-packages\pandas\io\parsers\readers.py", line 1026, in read_csv
+    return _read(filepath_or_buffer, kwds)
+  File "C:\Users\afrin\AppData\Roaming\Python\Python310\site-packages\pandas\io\parsers\readers.py", line 620, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+  File "C:\Users\afrin\AppData\Roaming\Python\Python310\site-packages\pandas\io\parsers\readers.py", line 1620, in __init__
+    self._engine = self._make_engine(f, self.engine)
+  File "C:\Users\afrin\AppData\Roaming\Python\Python310\site-packages\pandas\io\parsers\readers.py", line 1880, in _make_engine
+    self.handles = get_handle(
+  File "C:\Users\afrin\AppData\Roaming\Python\Python310\site-packages\pandas\io\common.py", line 873, in get_handle
+    handle = open(
+FileNotFoundError: [Errno 2] No such file or directory: 'mall_customers.csv'
+2026-04-03 14:37:22,434 | ERROR | unsupervised_clustering | Training pipeline failed
+Traceback (most recent call last):
+  File "C:\Users\afrin\OneDrive\Documents\GitHub\Unsupervised-Clustering\src\data_loader.py", line 26, in load_data
+    df = pd.read_csv(self.data_path)
+  File "C:\Users\afrin\AppData\Roaming\Python\Python310\site-packages\pandas\io\parsers\readers.py", line 1026, in read_csv
+    return _read(filepath_or_buffer, kwds)
+  File "C:\Users\afrin\AppData\Roaming\Python\Python310\site-packages\pandas\io\parsers\readers.py", line 620, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+  File "C:\Users\afrin\AppData\Roaming\Python\Python310\site-packages\pandas\io\parsers\readers.py", line 1620, in __init__
+    self._engine = self._make_engine(f, self.engine)
+  File "C:\Users\afrin\AppData\Roaming\Python\Python310\site-packages\pandas\io\parsers\readers.py", line 1880, in _make_engine
+    self.handles = get_handle(
+  File "C:\Users\afrin\AppData\Roaming\Python\Python310\site-packages\pandas\io\common.py", line 873, in get_handle
+    handle = open(
+FileNotFoundError: [Errno 2] No such file or directory: 'mall_customers.csv'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\afrin\OneDrive\Documents\GitHub\Unsupervised-Clustering\src\train.py", line 93, in run_training_pipeline
+    df = data_loader.load_data()
+  File "C:\Users\afrin\OneDrive\Documents\GitHub\Unsupervised-Clustering\src\data_loader.py", line 40, in load_data
+    raise ProjectException(f"Error loading data: {exc}") from exc
+src.custom_exception.ProjectException: Error loading data: [Errno 2] No such file or directory: 'mall_customers.csv'
+2026-04-03 14:39:30,189 | INFO | unsupervised_clustering | Training pipeline started
+2026-04-03 14:39:30,189 | INFO | unsupervised_clustering | Loading dataset from data\mall_customers.csv
+2026-04-03 14:39:30,217 | INFO | unsupervised_clustering | Dataset loaded with shape (200, 5)
+2026-04-03 14:39:30,233 | INFO | unsupervised_clustering | Fitting scaler on columns: ['Age', 'Annual_Income', 'Spending_Score']
+2026-04-03 14:39:30,252 | INFO | unsupervised_clustering | Scaling completed successfully
+2026-04-03 14:39:33,043 | INFO | unsupervised_clustering | Elbow scores calculated successfully
+2026-04-03 14:39:33,226 | INFO | unsupervised_clustering | Silhouette scores calculated successfully
+2026-04-03 14:39:33,292 | INFO | unsupervised_clustering | Training pipeline completed successfully

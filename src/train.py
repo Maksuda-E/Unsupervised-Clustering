@@ -1,132 +1,184 @@
-# This line imports os for folder creation
-import os
+# Import pandas for dataframe operations.
+import pandas as pd
 
-# This line imports json for saving metrics
-import json
-
-# This line imports pickle for saving model objects
-import pickle
-
-# This line imports KMeans for clustering
+# Import KMeans for clustering.
 from sklearn.cluster import KMeans
 
-# This line imports StandardScaler for scaling features
-from sklearn.preprocessing import StandardScaler
+# Import all required configuration classes.
+from src.config import ArtifactConfig, DataConfig, ModelConfig
 
-# This line imports silhouette_score for evaluation
-from sklearn.metrics import silhouette_score
-
-# This line imports configuration values
-from src.config import ARTIFACTS_DIR, MODEL_FILE_PATH, SCALER_FILE_PATH, METRICS_FILE_PATH, RANDOM_STATE, N_CLUSTERS
-
-# This line imports the logger
-from src.logger import get_logger
-
-# This line imports the custom exception
+# Import the custom exception class.
 from src.custom_exception import ProjectException
 
-# This line creates a logger for this file
-logger = get_logger(__name__)
+# Import the dataset loader.
+from src.data_loader import DataLoader
 
-# This function scales the input features
-def scale_features(x):
-    # This line starts the try block
-    try:
-        # This line logs scaling start
-        logger.info("Feature scaling started")
+# Import the evaluator class.
+from src.evaluate import ClusterEvaluator
 
-        # This line creates the scaler
-        scaler = StandardScaler()
+# Import the project logger.
+from src.logger import logger
 
-        # This line fits and transforms the feature data
-        x_scaled = scaler.fit_transform(x)
+# Import the preprocessor class.
+from src.preprocessing import DataPreprocessor
 
-        # This line logs scaling completion
-        logger.info("Feature scaling completed successfully")
+# Import utility functions for saving files.
+from src.utils import ensure_directories, save_json, save_object
 
-        # This line returns the scaled data and scaler
-        return x_scaled, scaler
 
-    # This block handles scaling errors
-    except Exception as exc:
-        # This line logs the error
-        logger.error("Error occurred during feature scaling")
+# Create a function to return simple notebook based cluster names.
+def get_segment_name(cluster_id: int) -> str:
+    # Map cluster id to notebook style segment name.
+    mapping = {
+        0: "Average customers",
+        1: "High income low spending",
+        2: "High income high spending",
+        3: "Low income high spending",
+        4: "Low income low spending",
+    }
 
-        # This line raises a custom exception
-        raise ProjectException(f"Failed to scale features: {exc}")
+    # Return the cluster name if found.
+    return mapping.get(cluster_id, f"Cluster {cluster_id}")
 
-# This function trains the clustering model
-def train_model(x):
-    # This line starts the try block
-    try:
-        # This line scales the data
-        x_scaled, scaler = scale_features(x)
 
-        # This line logs training start
-        logger.info("KMeans model training started")
+# Create a function to return simple notebook based meanings.
+def get_segment_meaning(cluster_id: int) -> str:
+    # Map cluster id to a short human readable meaning.
+    mapping = {
+        0: "Customers with average income and average spending.",
+        1: "Customers who earn a lot but spend less.",
+        2: "Customers who earn a lot and spend a lot.",
+        3: "Customers who earn less but spend more.",
+        4: "Customers who earn less and spend less.",
+    }
 
-        # This line creates the KMeans model
-        model = KMeans(n_clusters=N_CLUSTERS, init="k-means++", random_state=RANDOM_STATE, n_init=10)
+    # Return the meaning if found.
+    return mapping.get(cluster_id, "General customer group.")
 
-        # This line fits the model on scaled data
-        model.fit(x_scaled)
 
-        # This line gets the cluster labels
-        labels = model.labels_
+# Create a function to build the segment profile dictionary.
+def create_segment_profiles(cluster_profile_df: pd.DataFrame) -> dict:
+    # Create an empty dictionary for all profiles.
+    profiles = {}
 
-        # This line calculates the silhouette score
-        silhouette = silhouette_score(x_scaled, labels)
+    # Loop through each row in the cluster summary table.
+    for _, row in cluster_profile_df.iterrows():
+        # Convert the cluster value to integer.
+        cluster_id = int(row["Cluster"])
 
-        # This line creates metrics dictionary
-        metrics = {
-            "n_clusters": N_CLUSTERS,
-            "silhouette_score": float(silhouette),
-            "inertia": float(model.inertia_)
+        # Create the dictionary for the current cluster.
+        profiles[str(cluster_id)] = {
+            "segment_name": get_segment_name(cluster_id),
+            "meaning": get_segment_meaning(cluster_id),
         }
 
-        # This line logs training completion
-        logger.info("KMeans model training completed successfully")
+    # Return the complete profiles dictionary.
+    return profiles
 
-        # This line returns the trained model, scaler, and metrics
-        return model, scaler, metrics
 
-    # This block handles training errors
-    except Exception as exc:
-        # This line logs the error
-        logger.error("Error occurred during model training")
-
-        # This line raises a custom exception
-        raise ProjectException(f"Failed to train clustering model: {exc}")
-
-# This function saves the model artifacts
-def save_artifacts(model, scaler, metrics):
-    # This line starts the try block
+# Create the full training pipeline function.
+def run_training_pipeline() -> None:
+    # Start a try block.
     try:
-        # This line creates the artifacts folder if it does not exist
-        os.makedirs(ARTIFACTS_DIR, exist_ok=True)
+        # Create artifacts and log folders if needed.
+        ensure_directories(ArtifactConfig.ARTIFACT_DIR, ArtifactConfig.LOG_DIR)
 
-        # This line opens the model file in write binary mode
-        with open(MODEL_FILE_PATH, "wb") as model_file:
-            # This line saves the model
-            pickle.dump(model, model_file)
+        # Log the start of training.
+        logger.info("Training pipeline started")
 
-        # This line opens the scaler file in write binary mode
-        with open(SCALER_FILE_PATH, "wb") as scaler_file:
-            # This line saves the scaler
-            pickle.dump(scaler, scaler_file)
+        # Create a loader object.
+        data_loader = DataLoader(DataConfig.DATA_PATH)
 
-        # This line opens the metrics file in write mode
-        with open(METRICS_FILE_PATH, "w", encoding="utf-8") as metrics_file:
-            # This line saves the metrics
-            json.dump(metrics, metrics_file, indent=4)
+        # Load the dataset.
+        df = data_loader.load_data()
 
-        # This line logs successful artifact saving
-        logger.info("Artifacts saved successfully")
+        # Create the preprocessor using the final project feature columns.
+        preprocessor = DataPreprocessor(ModelConfig.FEATURE_COLUMNS)
 
-    # This block handles saving errors
+        # Scale the training features.
+        X_scaled = preprocessor.fit_transform(df)
+
+        # Create the evaluator object.
+        evaluator = ClusterEvaluator(
+            random_state=ModelConfig.RANDOM_STATE,
+            init=ModelConfig.INIT,
+            n_init=ModelConfig.N_INIT,
+            max_iter=ModelConfig.MAX_ITER,
+        )
+
+        # Create the notebook style cluster search range.
+        k_range = range(3, 9)
+
+        # Calculate elbow scores.
+        elbow_df = evaluator.calculate_elbow(X_scaled, k_range)
+
+        # Calculate silhouette scores.
+        silhouette_df = evaluator.calculate_silhouette(X_scaled, k_range)
+
+        # Save elbow scores to CSV.
+        elbow_df.to_csv(ArtifactConfig.ELBOW_PATH, index=False)
+
+        # Save silhouette scores to CSV.
+        silhouette_df.to_csv(ArtifactConfig.SILHOUETTE_PATH, index=False)
+
+        # Create the final KMeans model with 5 clusters based on notebook segment type.
+        model = KMeans(
+            n_clusters=ModelConfig.N_CLUSTERS,
+            random_state=ModelConfig.RANDOM_STATE,
+            init=ModelConfig.INIT,
+            n_init=ModelConfig.N_INIT,
+            max_iter=ModelConfig.MAX_ITER,
+        )
+
+        # Fit the model and get cluster labels.
+        cluster_labels = model.fit_predict(X_scaled)
+
+        # Store labels back into the dataframe.
+        df["Cluster"] = cluster_labels
+
+        # Build cluster wise average profile table.
+        cluster_profile_df = (
+            df.groupby("Cluster")[ModelConfig.FEATURE_COLUMNS]
+            .mean()
+            .round(2)
+            .reset_index()
+        )
+
+        # Add customer count per cluster.
+        cluster_profile_df["Customer_Count"] = df["Cluster"].value_counts().sort_index().values
+
+        # Build the segment meaning dictionary.
+        segment_profiles = create_segment_profiles(cluster_profile_df)
+
+        # Save clustered training data.
+        df.to_csv(ArtifactConfig.CLUSTERED_DATA_PATH, index=False)
+
+        # Save cluster average profile table.
+        cluster_profile_df.to_csv(ArtifactConfig.CLUSTER_PROFILE_PATH, index=False)
+
+        # Save the segment JSON file.
+        save_json(ArtifactConfig.SEGMENT_PROFILE_PATH, segment_profiles)
+
+        # Save the trained model file.
+        save_object(ArtifactConfig.MODEL_PATH, model)
+
+        # Save the fitted scaler file.
+        save_object(ArtifactConfig.SCALER_PATH, preprocessor.scaler)
+
+        # Log successful completion.
+        logger.info("Training pipeline completed successfully")
+
+        # Print success messages for the terminal.
+        print("Training complete")
+        print(f"Model saved to: {ArtifactConfig.MODEL_PATH}")
+        print(f"Scaler saved to: {ArtifactConfig.SCALER_PATH}")
+        print(f"Cluster profiles saved to: {ArtifactConfig.CLUSTER_PROFILE_PATH}")
+        print(f"Segment profiles saved to: {ArtifactConfig.SEGMENT_PROFILE_PATH}")
+
+    # Catch any pipeline error.
     except Exception as exc:
-        # This line logs the error
-        logger.error("Error occurred while saving artifacts")
+        # Log the full exception.
+        logger.exception("Training pipeline failed")
 
-        # This line raises a custom exception
-        raise ProjectException(f"Failed to save artifacts: {exc}")
+        # Raise a project specific exception.
+        raise ProjectException(f"Training pipeline failed: {exc}") from exc
