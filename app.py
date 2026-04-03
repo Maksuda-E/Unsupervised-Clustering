@@ -303,7 +303,7 @@ with center_col:
             #  displays the error message
             st.error(f"Prediction failed: {exc}")
 
-#  shows explanation of what each cluster means in a styled card
+# This line shows explanation of what each cluster means in a styled card
 st.markdown(
     f"""
     <div class="guide-card">
