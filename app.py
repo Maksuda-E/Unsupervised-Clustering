@@ -277,6 +277,7 @@ st.info(
 )
 st.markdown(
     """
+<<<<<<< HEAD
     <div style="background:#ffffff; padding:20px; border-radius:16px; margin-top:20px;">
     <h4>Segment Meaning Guide</h4>
 
@@ -293,3 +294,31 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+=======
+    ### Segment Meaning Guide
+
+    These segments are created using clustering on Age, Annual Income, and Spending Score.
+    Each segment represents a group of customers with similar behavior patterns.
+
+    **Customer Segment A**  
+    Typically represents customers with balanced income and spending behavior.
+
+    **Customer Segment B**  
+    Often includes customers with higher income but relatively lower spending.
+
+    **Customer Segment C**  
+    Usually indicates high income customers who also spend more frequently.
+
+    **Customer Segment D**  
+    Represents customers with lower income but higher spending tendencies.
+
+    **Customer Segment E**  
+    Includes customers with lower income and lower spending behavior.
+
+    **Customer Segment F**  
+    Often corresponds to older or moderate income customers with steady spending patterns.
+
+    Note: These meanings are general interpretations. Exact segment behavior depends on the trained model.
+    """
+)
+>>>>>>> 906b11eaf54209cd71ea8cc74ac51c1839bf9819
