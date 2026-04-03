@@ -36,7 +36,7 @@ The dataset contains the following features:
 - Annual_Income: Income in thousands
 - Spending_Score: Score between 1–100
 
-# Dataset file:data/mall_customers.csv
+Dataset file:data/mall_customers.csv
 
 
 # Model Workflow
