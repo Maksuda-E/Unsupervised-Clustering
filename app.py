@@ -1,37 +1,38 @@
-# This line imports json for loading cluster mapping
+#  imports json for loading cluster mapping
 import json
 
-# This line imports os for file path checking
+#  imports os for file path checking
 import os
 
-# This line imports streamlit for the web app
+#  imports streamlit for the web app
 import streamlit as st
 
-# This line imports the prediction function
+#  imports the prediction function
 from src.predict import predict_cluster
 
-# This line sets the page configuration
+import textwrap
+#  sets the page configuration
 st.set_page_config(
     page_title="Mall Customer Segmentation",
     layout="wide"
 )
 
-# This line defines the cluster mapping file path
+#  defines the cluster mapping file path
 CLUSTER_MAPPING_FILE_PATH = "artifacts/cluster_mapping.json"
 
 # This function loads saved cluster mapping if available
 def load_cluster_mapping():
-    # This line checks whether the mapping file exists
+    #  checks whether the mapping file exists
     if os.path.exists(CLUSTER_MAPPING_FILE_PATH):
-        # This line opens the mapping file
+        #  opens the mapping file
         with open(CLUSTER_MAPPING_FILE_PATH, "r", encoding="utf-8") as file:
-            # This line loads the mapping data
+            #  loads the mapping data
             mapping = json.load(file)
 
-        # This line converts mapping keys back to integers
+        #  converts mapping keys back to integers
         return {int(key): value for key, value in mapping.items()}
 
-    # This line returns default mapping if file does not exist
+    #  returns default mapping if file does not exist
     return {
         0: "Older moderate customers.",
         1: "Balanced customers.",
@@ -41,7 +42,7 @@ def load_cluster_mapping():
         5: "Low income low spending customers."
     }
 
-# This line adds custom CSS styling for the design and cards
+#  adds custom CSS styling for the design and cards
 st.markdown(
     """
     <style>
@@ -171,37 +172,37 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# This line loads the cluster labels from saved mapping
+#  loads the cluster labels from saved mapping
 cluster_labels = load_cluster_mapping()
 
-# This line displays the main title
+#  displays the main title
 st.markdown(
     '<div class="main-title">Mall Customer Segmentation App</div>',
     unsafe_allow_html=True
 )
 
-# This line displays the subtitle
+#  displays the subtitle
 st.markdown(
     '<div class="sub-title">Enter customer details to predict the customer segment</div>',
     unsafe_allow_html=True
 )
 
-# This line creates a centered page layout
+#  creates a centered page layout
 left_space, center_col, right_space = st.columns([0.6, 4, 0.6])
 
 # This block contains the main layout
 with center_col:
 
-    # This line creates two columns for the form and side panel
+    #  creates two columns for the form and side panel
     form_col, side_col = st.columns([2.1, 1], gap="large")
 
     # This block creates the form section
     with form_col:
 
-        # This line displays the section title
+        #  displays the section title
         st.markdown('<div class="section-title">Customer Details</div>', unsafe_allow_html=True)
 
-        # This line creates two columns for age and annual income
+        #  creates two columns for age and annual income
         row1_col1, row1_col2 = st.columns(2)
 
         # This block creates the age input
@@ -223,7 +224,7 @@ with center_col:
                 step=1.0
             )
 
-        # This line creates the spending score slider
+        #  creates the spending score slider
         spending_score = st.slider(
             "Spending Score",
             min_value=0.0,
@@ -232,16 +233,16 @@ with center_col:
             step=1.0
         )
 
-        # This line adds spacing before the button
+        #  adds spacing before the button
         st.markdown("<br>", unsafe_allow_html=True)
 
-        # This line creates the prediction button
+        #  creates the prediction button
         predict_button = st.button("Predict Customer Segment")
 
     # This block creates the side overview section
     with side_col:
 
-        # This line displays the overview card
+        #  displays the overview card
         st.markdown(
             f"""
             <div class="summary-card">
@@ -256,16 +257,16 @@ with center_col:
             unsafe_allow_html=True
         )
 
-        # This line checks whether a previous prediction exists
+        #  checks whether a previous prediction exists
         if "mall_cluster_result" in st.session_state:
 
-            # This line gets the stored cluster result
+            #  gets the stored cluster result
             result = st.session_state["mall_cluster_result"]
 
-            # This line gets the mapped cluster meaning
+            #  gets the mapped cluster meaning
             cluster_meaning = cluster_labels.get(result, f"Customer behavior pattern for cluster {result}.")
 
-            # This line displays the prediction result card
+            #  displays the prediction result card
             st.markdown(
                 f"""
                 <div class="result-card">
@@ -277,34 +278,35 @@ with center_col:
                 unsafe_allow_html=True
             )
 
-    # This line checks whether the prediction button has been clicked
+    #  checks whether the prediction button has been clicked
     if predict_button:
 
-        # This line prepares the model input dictionary
+        #  prepares the model input dictionary
         user_input = {
             "Age": age,
             "Annual_Income": annual_income,
             "Spending_Score": spending_score
         }
 
-        # This line starts the safe prediction block
+        #  starts the safe prediction block
         try:
-            # This line gets the predicted cluster
+            #  gets the predicted cluster
             result = predict_cluster(user_input)
 
-            # This line stores the result in session state
+            #  stores the result in session state
             st.session_state["mall_cluster_result"] = result
 
-            # This line reruns the app so the result appears immediately
+            #  reruns the app so the result appears immediately
             st.rerun()
 
         # This block handles prediction errors
         except Exception as exc:
-            # This line displays the error message
+            #  displays the error message
             st.error(f"Prediction failed: {exc}")
 
-# This line shows the cluster meaning guide as a styled card
-guide_html = f"""
+
+
+guide_html = textwrap.dedent(f"""
 <div class="guide-card">
     <div class="guide-title">Segment Meaning Guide</div>
 
@@ -342,7 +344,6 @@ guide_html = f"""
         <b>Note:</b> These descriptions are general cluster interpretations based on the trained clustering model.
     </div>
 </div>
-"""
+""")
 
-# This line renders the guide card
 st.markdown(guide_html, unsafe_allow_html=True)
