@@ -36,10 +36,63 @@ The dataset contains the following features:
 - Annual_Income: Income in thousands
 - Spending_Score: Score between 1–100
 
-Dataset file:data/mall_customers.csv
+# Dataset file:data/mall_customers.csv
 
 
----
+# Model Workflow
+Load dataset
+Select features: Age, Annual Income, Spending Score
+Scale data using StandardScaler
+Train KMeans clustering model
+Evaluate clusters using:
+Elbow Method (WCSS)
+Silhouette Score
+Select optimal clusters (k = 6)
+Save model and artifacts
+Use model in Streamlit app for predictions
+
+
+# Cluster Interpretation (6 Clusters)
+
+The final model segments customers into 6 groups:
+
+High income, high spending customers
+High income, low spending customers
+Low income, high spending customers
+Low income, low spending customers
+Young average customers
+Older average customers
+
+These segments help businesses target marketing strategies effectively.
+
+How to Run
+# Install dependencies
+pip install -r requirements.txt
+
+# Run training pipeline
+python main.py
+
+# Run Streamlit app
+streamlit run app.py
+
+
+# Deployment
+
+The application is deployed using Streamlit Cloud.
+
+Users can:
+
+Input customer details
+Predict customer segment
+View cluster visualization
+Understand customer group behavior
+
+# Key Features
+Modular code structure
+Logging and exception handling
+Model evaluation using proper clustering metrics
+Interactive web application
+cluster prediction
 
 ## Project Structure
 
@@ -77,58 +130,3 @@ Unsupervised-Clustering/
     ├── train.py
     └── utils.py
 
-
-Model Workflow
-Load dataset
-Select features: Age, Annual Income, Spending Score
-Scale data using StandardScaler
-Train KMeans clustering model
-Evaluate clusters using:
-Elbow Method (WCSS)
-Silhouette Score
-Select optimal clusters (k = 6)
-Save model and artifacts
-Use model in Streamlit app for predictions
-
-
-Cluster Interpretation (6 Clusters)
-
-The final model segments customers into 6 groups:
-
-High income, high spending customers
-High income, low spending customers
-Low income, high spending customers
-Low income, low spending customers
-Young average customers
-Older average customers
-
-These segments help businesses target marketing strategies effectively.
-
-How to Run
-# Install dependencies
-pip install -r requirements.txt
-
-# Run training pipeline
-python main.py
-
-# Run Streamlit app
-streamlit run app.py
-
-
-Deployment
-
-The application is deployed using Streamlit Cloud.
-
-Users can:
-
-Input customer details
-Predict customer segment
-View cluster visualization
-Understand customer group behavior
-
-Key Features
-Modular code structure
-Logging and exception handling
-Model evaluation using proper clustering metrics
-Interactive web application
-cluster prediction
