@@ -71,7 +71,7 @@ pip install -r requirements.txt
 python main.py
 
 # Run Streamlit app
-streamlit run app.py
+python -m streamlit run app.py
 
 # Streamlit Link
 https://unsupervised-clustering-maksuda.streamlit.app/

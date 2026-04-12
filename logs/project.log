@@ -123,3 +123,10 @@ src.custom_exception.ProjectException: Error loading data: [Errno 2] No such fil
 2026-04-03 14:53:27,838 | INFO | unsupervised_clustering | Elbow scores calculated successfully
 2026-04-03 14:53:27,987 | INFO | unsupervised_clustering | Silhouette scores calculated successfully
 2026-04-03 14:53:28,040 | INFO | unsupervised_clustering | Training pipeline completed successfully
+2026-04-12 15:23:46,989 | INFO | unsupervised_clustering | Prediction artifacts loaded successfully
+2026-04-12 15:23:55,033 | INFO | unsupervised_clustering | Prediction completed successfully
+2026-04-12 15:24:01,208 | INFO | unsupervised_clustering | Prediction completed successfully
+2026-04-12 15:24:04,022 | INFO | unsupervised_clustering | Prediction completed successfully
+2026-04-12 15:24:08,149 | INFO | unsupervised_clustering | Prediction completed successfully
+2026-04-12 15:24:18,643 | INFO | unsupervised_clustering | Prediction completed successfully
+2026-04-12 15:24:32,537 | INFO | unsupervised_clustering | Prediction completed successfully
