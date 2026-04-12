@@ -13,7 +13,6 @@ The project follows the notebook workflow:
 4. Build final model using Age, Annual Income, and Spending Score
 5. Final optimal number of clusters selected as 6
 
----
 
 ## Problem Statement
 
@@ -24,7 +23,6 @@ Using clustering, customers are grouped into segments based on:
 - Spending behavior
 - Age
 
----
 
 ## Dataset
 
@@ -75,6 +73,8 @@ python main.py
 # Run Streamlit app
 streamlit run app.py
 
+# Streamlit Link
+https://unsupervised-clustering-maksuda.streamlit.app/
 
 # Deployment
 
